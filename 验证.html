@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style type="text/css">
+		.wrap{width: 350px;margin: 50px auto;border: 1px solid #ddd;padding: 20px;font-family: "微软雅黑"}
+		.wrap .textRandom{width: 350px;height: 160px;background-color: #ddd;position: relative;font-family: serif;}
+		.wrap .textRandom span{color: #fff;font-size: 28px;position: absolute;width: 30px;height: 30px;line-height: 30px;text-align: center;cursor: default;font-weight: bold;}
+		.wrap .textRandom i{display:block;width:16px;height:16px;position:absolute;top:10px;left:10px;background:url(images/icon.png);}
+		.wrap .infoBtn{width:350px;height:32px;border:1px solid #cbcbcb;border-radius:90px;line-height: 32px;text-align: center;margin-top: 20px;}
+		.wrap .infoBtn .text{display: inline-block;}
+		.wrap .infoBtn span{margin: 0px 5px;}
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<!-- 产生文字的 -->
+		<div class="textRandom">
+			
+		</div>
+		<!-- 验证信息 -->
+		<div class="infoBtn">
+			>>请依次点击<div class="text"></div>完成验证>>
+		</div>
+	</div>
+</body>
+</html>
+<script type="text/javascript" src="js/jquery-3.2.1.js"></script>
+<script type="text/javascript" src="js/word.js"></script>
+<script type="text/javascript">
+	var array = [];
+	var refCode = [];
+	var clickCode = [];
+	$(function(){
+		randomBg();
+ 		randomAll();
+ 		randomClick();
+		var clickCount = 0;
+		var ifCheck = true;
+		$(document).on('click', '.textRandom span', function(event) {
+			$(this).append('<i></i>');
+			var s = $(this).text();
+			clickCode.push(s);
+			clickCount ++;
+
+			if(clickCount == 3){
+				for(var i=0;i<3;i++){
+					if(clickCode[i] != refCode[i]){
+						ifCheck = false;
+					}
+				}
+			 	if(!ifCheck){
+			 		alert("验证码错误");
+			 		$(".textRandom span i").remove();
+			 		$(".infoBtn .text span").remove();
+					$(".textRandom").html("");
+					array = [];
+					refCode = [];
+					clickCode = [];
+					ifCheck = true;
+					clickCount = 0;
+			 		randomBg();
+			 		randomAll();
+			 		randomClick()
+			 	}else{
+			 		alert("验证成功")
+			 	}
+			}
+			event.preventDefault();
+		});
+	});
+
+	// 生成随机背景颜色
+	function randomBg(){
+		var bgColor = '#'+Math.floor(Math.random()*0xffffff).toString(16);
+		$(".textRandom").css('background-color', bgColor);
+	}
+	// 生成随机数
+	function randomAll(){
+		var tmp = [],tmp2 = [],tmp3 = [];
+		var top = positionTop();
+		var left = positionLeft();
+		for(var i=0;i<6;){
+			var flag = 0,flag2 = 0,flag3 = 0;
+			var index = Math.floor(Math.random() * textArray.length);
+			// 去重验证码
+			tmp.push(index);
+			for(var j=0;j<tmp.length;j++){
+				if(index == tmp[j]){
+					flag ++;
+				}
+			}
+			if(flag <= 1){
+	    		array.push(textArray[index])
+	    		$(".textRandom").append('<span style="left:'+ left[i] +'px;top:'+ top[i] +'px">' + textArray[index] + '</span>');
+	    		i++;
+			}
+		}
+	}
+	// 生成需要点击的验证码
+	function randomClick(){
+		var tmp = [];
+		for(var i=0;i<3;){
+			var flag = 0;
+			var index = Math.floor(Math.random()*6);
+			// 去重
+			tmp.push(index);
+			for(var j=0;j<tmp.length;j++){
+				if(index == tmp[j]){
+					flag ++;;
+				}
+			}
+			if(flag <= 1){
+				var code = array[index];
+				refCode.push(code)
+				$(".infoBtn .text").append('<span>"' + code + '"</span>');
+				i++;
+			}
+		}
+	}
+	// 生成位置
+	function positionTop(){
+		var map = [];
+		var flag = true;
+		while(flag){
+			var top = Math.floor(Math.random()*130);
+			map.push(top);
+			for(var j=0;j<map.length-1;j++){
+				var min = map[j] - 20;
+				var max = map[j] + 20
+				if(top >= min && top <= max && top != map[j]){
+					map.pop();
+					break;
+				}
+				if(map.length == 6){
+					flag = false;
+				}
+			}
+			
+			
+		}
+	 	map.sort();
+		return map;
+	}
+	function positionLeft(){
+    	var map = [];
+		var flag = true;
+		while(flag){
+			var left = Math.floor(Math.random()*320);
+			map.push(left);
+			for(var j=0;j<map.length-1;j++){
+				var min = map[j] - 20;
+				var max = map[j] + 20
+				if(left >= min && left <= max && left != map[j]){
+					map.pop();
+					break;
+				}
+				if(map.length == 6){
+					flag = false;
+				}
+			}
+		}
+	 	map.sort();
+		return map;
+	}
+</script>
